@@ -1,11 +1,18 @@
+"""
+Schemas for databases for user login and plant shares
+"""
+
+from typing import Union
 from pydantic import BaseModel
-from typing import Annotated, Union
-from fastapi import Depends, FastAPI
-from fastapi.security import OAuth2PasswordBearer
 
 
 # From fastapi tutorial
 class User(BaseModel):
+    """
+    For managing user logins
+    disabled refers to whether the account is active
+    """
+
     username: str
     email: Union[str, None] = None
     full_name: Union[str, None] = None
