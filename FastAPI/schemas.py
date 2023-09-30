@@ -25,7 +25,7 @@ class UserInDB(User):
 
 
 class ShareBase(BaseModel):
-    """Pydantic model that accepts or regects plant share"""
+    """Pydantic model for plant share"""
 
     plant_name: str
     shared_by: str
@@ -38,6 +38,27 @@ class ShareBase(BaseModel):
 class ShareModel(ShareBase):
     """
     The model for sharing
+    """
+
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+class RequestBase(BaseModel):
+    """Pydantic model for plant request"""
+
+    plant_name: str
+    requested_by: str
+    amount: float
+    notes: str
+    date: str
+
+
+class RequestModel(RequestBase):
+    """
+    The model for requesting a plant
     """
 
     id: int

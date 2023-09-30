@@ -12,8 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Extra folders
+FastAPI/extra
+React/src/extra
+
 # Editor directories and files
 .vscode/*
+FastAPI/.vscode/*
+FastAPI/__pycache__
 !.vscode/extensions.json
 .idea
 .DS_Store

@@ -8,6 +8,7 @@ https://www.youtube.com/watch?v=0zb2kohYZIM
 https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Client-side_JavaScript_frameworks/React_getting_started
 https://fastapi.tiangolo.com/tutorial/
 https://betterprogramming.pub/how-to-authentication-users-with-token-in-a-react-application-f99997c2ee9d
+https://www.youtube.com/watch?v=_dIs3IZAG0Q
 """
 
 from typing import Annotated, List
@@ -17,7 +18,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 
-from schemas import User, UserInDB, ShareBase, ShareModel
+from schemas import User, UserInDB, ShareBase, ShareModel, RequestBase, RequestModel
 import models
 
 
@@ -102,18 +103,29 @@ def get_db():
     finally:
         db.close()
 
+def get_requests_db():
+    """
+    Dependency injection for our plant requests database. Only opens when
+    request comes in and closes when request is complete
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Create database which will create table with columns automatically
 # Set a variable to contain the type. Here Depends tells fastapi
 # that this type is something that a function may need but not
 # something it will get from a user submitting to an endpoint
 db_dependency = Annotated[Session, Depends(get_db)]
+db_dependency_requests = Annotated[Session, Depends(get_requests_db)]
 token_dependency = Annotated[str, Depends(oauth2_scheme)]
 
 models.Base.metadata.create_all(bind=engine)
 
 
-# Create first endpoint for our shares application
+# Create endpoint for shares
 # Because db is type that has Depends in it, the user will not need
 # to specifiy it
 @app.post("/shares/", response_model=ShareModel)
@@ -135,10 +147,72 @@ async def create_share(share: ShareBase, db: db_dependency):
     "/shares/",
     response_model=List[ShareModel],
 )
-async def read_shares(db: db_dependency, skip: int = 0, limit: int = 100):
+async def read_shares(db: db_dependency):
+    """Get the shared plants"""
     # token: token_dependency,
-    shares = db.query(models.Shares).offset(skip).limit(limit).all()
+    shares = db.query(models.Shares).all()
     return shares
+
+
+def http_exception():
+    return HTTPException(status_code=404, detail="Plant not found")
+
+
+@app.delete("/shares/{shares_id}")
+async def delete_share(shares_id: int, db: Session = Depends(get_db)):
+    """Delete a shared plant from the database"""
+    todo_model = db.query(models.Shares).filter(models.Shares.id == shares_id).first()
+
+    if todo_model is None:
+        raise http_exception()
+
+    db.query(models.Shares).filter(models.Shares.id == shares_id).delete()
+    db.commit()
+
+    return successful_response(200)
+
+
+def successful_response(status_code: int):
+    return {"status": status_code, "transaction": "Successful"}
+
+
+# Create endpoint for plant requests
+@app.post("/requests/", response_model=RequestModel)
+async def create_request(request: RequestBase, db: db_dependency_requests):
+    """
+    Map the variables from our RequestBase to our requests table to
+    save into our sqlite database
+    """
+    db_request = models.Requests(**request.dict())
+    db.add(db_request)
+    db.commit()
+    db.refresh(db_request)
+    return db_request
+
+
+@app.get(
+    "/requests/",
+    response_model=List[RequestModel],
+)
+async def read_requests(db: db_dependency_requests):
+    """Get the requested plant"""
+    requests = db.query(models.Requests).all()
+    return requests
+
+
+
+@app.delete("/requests/{requests_id}")
+async def delete_request(requests_id: int, db: Session = Depends(get_requests_db)):
+    """Delete a shared plant from the database"""
+    request_model = db.query(models.Requests).filter(models.Requests.id == requests_id).first()
+
+    if request_model is None:
+        raise http_exception()
+
+    db.query(models.Requests).filter(models.Requests.id == requests_id).delete()
+    db.commit()
+
+    return successful_response(200)
 
 
 # From fastapi tutorial; updated 2023/09/18

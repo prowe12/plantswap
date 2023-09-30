@@ -3,45 +3,76 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import api from "./../api"
 import Available from "./Available"
+import Requested from "./Requested"
 import Login from './Login'
 
 
 const Dashboard = () => {
     const [token, setToken] = useState()
+    // PLANT SHARES
     // Set up share, which will be the recipient of the plant form data
     const [shares, setShares] = useState([]);
 
     // Default form data for plant shares
     const [formData, setFormData] = useState({
-        amount: '',
         shared_by: '',
-        description: '',
         plant_name: '',
+        amount: '',
+        description: '',
         is_available_now: false,
         date: ''
     })
 
+    // Assign to shares the data from the shares endpoint
     const fetchShares = async () => {
         const response = await api.get('/shares/')
         setShares(response.data)
     };
 
-    // What does this do?
+    // PLANT REQUESTS
+    // Set up request, which will be the recipient of the plant form data
+    const [requests, setRequests] = useState([]);
+
+    // Default form data for plant shares
+    const [requestFormData, setRequestFormData] = useState({
+        requested_by: '',
+        plant_name: '',
+        amount: '',
+        notes: '',
+        date: ''
+    })
+
+    const fetchRequests = async () => {
+        const response = await api.get('/requests/')
+        setRequests(response.data)
+    };
+
+    // Get shares and requests data from their endpoints at mount (first render)
+    // to fill out the Available and Requested plants tables
     useEffect(() => {
         fetchShares();
+        fetchRequests();
     }, []);
+    
 
+    // Add user inputs to plant share form
     const handleInputChange = (event) => {
         // Test condition event.target.type === 'checkbox'
         // If true, value is event.target.checked
         // If false, value is event.target.value
         const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+        const datevalue =  new Date().toLocaleDateString();
+
         setFormData({
             ...formData,
             [event.target.name]: value,
+            date: datevalue,
         });
     };
 
+    // Post plant share form to endpoint when the user submits it 
+    // (so it can be added to the database), and add it to the shares table.
+    // Then reset the share form fields to blank
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         // Post, get, and set shares
@@ -50,7 +81,7 @@ const Dashboard = () => {
             await api.post('/shares/', formData);
             fetchShares();
         }
-        // Reset the login form to blank
+        // Reset the shares form to blank
         setFormData({
             amount: '',
             shared_by: '',
@@ -61,13 +92,60 @@ const Dashboard = () => {
         });
     };
 
+
+    // Add user inputs to plant request form
+    const handleRequestInputChange = (event) => {
+        const value =  event.target.value;
+        const datevalue =  new Date().toLocaleDateString();
+
+        setRequestFormData({
+            ...requestFormData,
+            [event.target.name]: value,
+            date: datevalue,
+        });
+    };
+
+    
+    // Post plant request form to endpoint when the user submits it 
+    // (so it can be added to the database), and add it to the requests table.
+    // Then reset the request form fields to blank
+    const handleRequestFormSubmit = async (event) => {
+        event.preventDefault();
+        // Get the date and add it to the form data
+        // addDateToFormData();
+        // setRequestFormData({
+        //     ...requestFormData,
+        //     date: 'hello',
+        // });
+        
+        // Post, get, and set requests
+        if (token) {
+            await api.post('/requests/', requestFormData);
+            fetchRequests();
+        }
+        // Reset the requests form to blank
+        setRequestFormData({
+            requested_by: '',
+            amount: '',
+            notes: '',
+            plant_name: '',
+            date: ''
+        });
+    };
+
+
     if (!token) {
-        // If the user has not logged in, show only the available plants
+        // If the user has not logged in, do not show submit forms
         {
             return (
                 <div>
+                    {/* Login form */}
                     <div>
                         <Login setToken={setToken} />
+                    </div>
+
+                    {/* Table of available plants */}
+                    <div>
                         {/* Send shares data to component that makes table of available plants */}
                         <Available shares={shares.map((share) => (
                             <tr key={(share.id)}>
@@ -81,10 +159,27 @@ const Dashboard = () => {
                         ))} />
                     </div>
 
+                    {/* Table of requested plants */}
+                    <div>
+                        {/* Send request data to component that makes table of requested plants */}
+                        <Requested requests={requests.map((request) => (
+                            <tr key={(request.id)}>
+                                <td>{request.plant_name}</td>
+                                <td>{request.amount}</td>
+                                <td>{request.notes}</td>
+                                <td>{request.requested_by}</td>
+                                <td>{request.date}</td>
+                            </tr>
+                        ))} />
+                    </div>
+
+                    {/* Display a note that the user must log in to share plants */}
                     <div className="share_plant" id="share">
                         <h1>Share Plants</h1>
                         <p>Please log in to add plants to share.</p>
                     </div>
+
+                    {/* Display a note that the user must log in to request plants */}
                     <div className="request_plant" id="request">
                         <h1>Request Plants</h1>
                         <p>Please log in to request plants.</p>
@@ -96,31 +191,42 @@ const Dashboard = () => {
     return (
         // If the user *has* logged in, also show forms to add/delete plants
         <div>
+            {/* Table of available plants */}
+            <div>
+                {/* Send shares data to component that makes table of available plants */}
+                <Available shares={shares.map((share) => (
+                    <tr key={(share.id)}>
+                        <td>{share.plant_name}</td>
+                        <td>{share.amount}</td>
+                        <td>{share.description}</td>
+                        <td>{share.is_available_now ? 'Yes' : 'No'} </td>
+                        <td>{share.shared_by}</td>
+                        <td>{share.date}</td>
+                    </tr>
+                ))} />
+            </div>
 
-            {/* Send shares data to component that makes table of available plants */}
-            <Available shares={shares.map((share) => (
-                <tr key={(share.id)}>
-                    <td>{share.plant_name}</td>
-                    <td>{share.amount}</td>
-                    <td>{share.description}</td>
-                    <td>{share.is_available_now ? 'Yes' : 'No'} </td>
-                    <td>{share.shared_by}</td>
-                    <td>{share.date}</td>
-                </tr>
-            ))} />
+            {/* Table of requested plants */}
+            <div>
+                {/* Send request data to component that makes table of requested plants */}
+                <Requested requests={requests.map((request) => (
+                    <tr key={(request.id)}>
+                        <td>{request.plant_name}</td>
+                        <td>{request.amount}</td>
+                        <td>{request.notes}</td>
+                        <td>{request.requested_by}</td>
+                        <td>{request.date}</td>
+                    </tr>
+                ))} />
+            </div>
 
+
+            {/* Form for sharing a plant */}
             <div className="share_plant" id="share">
                 <h1>Share a plant</h1>
-
                 <form onSubmit={handleFormSubmit}>
                     <table>
                         <tbody>
-                            <tr>
-                                <td><label htmlFor='shared_by' className='form-label'>Shared by</label> </td>
-                                <td>
-                                    <input type='text' className='form-control' id='shared_by' name='shared_by' onChange={handleInputChange} value={formData.shared_by} />
-                                </td>
-                            </tr>
 
                             <tr>
                                 <td><label htmlFor='plant_name' className='form-label'>Plant name</label></td>
@@ -134,6 +240,13 @@ const Dashboard = () => {
                                     Amount
                                 </label></td>
                                 <td><input type='text' className='form-control' id='amount' name='amount' onChange={handleInputChange} value={formData.amount} /></td>
+                            </tr>
+
+                            <tr>
+                                <td><label htmlFor='shared_by' className='form-label'>
+                                    Shared by
+                                </label></td>
+                                <td><input type='text' className='form-control' id='shared_by' name='shared_by' onChange={handleInputChange} value={formData.shared_by} /></td>
                             </tr>
 
                             <tr>
@@ -151,13 +264,6 @@ const Dashboard = () => {
                                 </td>
                             </tr>
 
-                            <tr>
-                                <td><label htmlFor='date' className='form-label'>
-                                    Date
-                                </label></td>
-                                <td><input type='text' className='form-control' id='date' name='date' onChange={handleInputChange} value={formData.date} />
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
 
@@ -167,13 +273,53 @@ const Dashboard = () => {
                 </form>
 
             </div >
-
+            
+            {/* Form for requesting a plant */}
             <div className="request_plant" id="request">
                 <h1>Request a plant</h1>
+                <form onSubmit={handleRequestFormSubmit}>
+                    <table>
+                        <tbody>
+
+                            <tr>
+                                <td><label htmlFor='req_plant_name' className='form-label'>Plant name</label></td>
+                                <td>
+                                    <input type='text' className='form-control' id='req_plant_name' name='plant_name' onChange={handleRequestInputChange} value={requestFormData.plant_name} />
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td><label htmlFor='req_amount' className='form-label'>
+                                    Amount
+                                </label></td>
+                                <td><input type='text' className='form-control' id='req_amount' name='amount' onChange={handleRequestInputChange} value={requestFormData.amount} /></td>
+                            </tr>
+
+                            <tr>
+                                <td><label htmlFor='requested_by' className='form-label'>
+                                    Requested by
+                                </label></td>
+                                <td><input type='text' className='form-control' id='requested_by' name='requested_by' onChange={handleRequestInputChange} value={requestFormData.requested_by} /></td>
+                            </tr>
+
+                            <tr>
+                                <td><label htmlFor='req_notes' className='form-label'>
+                                    Notes
+                                </label></td>
+                                <td><input type='text' className='form-control' id='req_notes' name='notes' onChange={handleRequestInputChange} value={requestFormData.notes} /></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                    <button type='submit' className='btn btn-primary'>
+                        Submit
+                    </button>
+                </form>
             </div>
 
-        </div >
 
+        </div >
     )
 }
 

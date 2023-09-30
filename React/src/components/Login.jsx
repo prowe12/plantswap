@@ -45,7 +45,7 @@ const Login = ({ setToken }) => {
         <div>
             <h1>Sign Up Here</h1>
             <form onSubmit={handleSubmit}>
-                <p >Username</p>
+                <p>Username</p>
                 <input type="text" required onChange={(e) => setPassword(e.target.value)} placeholder='johndoe' />
                 <p>Password</p>
                 <input type="password" required onChange={(e) => setUsername(e.target.value)} placeholder='secret' />

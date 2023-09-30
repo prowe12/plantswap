@@ -12,8 +12,20 @@
   max-width: 100%;
   margin-right: auto;
   margin-left: auto;
-  padding-top: 12rem;
-  padding-bottom: 18rem;
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+  padding-left: 8rem;
+  padding-right: 8rem;
+  color: #0c5931;
+  background-color: white;
+}
+
+.requests_table {
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 8rem;
+  padding-bottom: 12rem;
   padding-left: 8rem;
   padding-right: 8rem;
   color: #0c5931;
