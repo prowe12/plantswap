@@ -111,13 +111,6 @@ const Dashboard = () => {
     // Then reset the request form fields to blank
     const handleRequestFormSubmit = async (event) => {
         event.preventDefault();
-        // Get the date and add it to the form data
-        // addDateToFormData();
-        // setRequestFormData({
-        //     ...requestFormData,
-        //     date: 'hello',
-        // });
-        
         // Post, get, and set requests
         if (token) {
             await api.post('/requests/', requestFormData);
