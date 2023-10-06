@@ -15,10 +15,17 @@ export default function Requested(props) {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.requests}
+                    {props.requests.map((request) => (
+                        <tr key={(request.id)}>
+                            <td>{request.plant_name}</td>
+                            <td>{request.amount}</td>
+                            <td>{request.notes}</td>
+                            <td>{request.requested_by}</td>
+                            <td>{request.date}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
-
         </div>
     );
 }

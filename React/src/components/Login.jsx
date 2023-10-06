@@ -11,7 +11,7 @@ async function LoginUser(credentials) {
             "Content-Type": "application/x-www-form-urlencoded"
         },
         // Todo: Hardwired to allowed username and password; get from form
-        body: "grant_type=&username=johndoe&password=secret&scope=&client_id=&client_secret="
+        body: "grant_type=&username=" + credentials.username + "&password=" + credentials.password + "&scope=&client_id=&client_secret="
     }).then(function (response) {
         if (response.ok) {
             return response.json();
@@ -29,8 +29,8 @@ async function LoginUser(credentials) {
 
 
 
-const Login = ({ setToken }) => {
-    const [username, setUsername] = useState()
+const Login = ({ setToken, setUsername}) => {
+    const [username, setUsernameHere] = useState()
     const [password, setPassword] = useState()
 
     const handleSubmit = async (e) => {
@@ -40,15 +40,16 @@ const Login = ({ setToken }) => {
             password
         })
         setToken(token)
+        setUsername(username)
     }
     return (
         <div>
             <h1>Sign Up Here</h1>
             <form onSubmit={handleSubmit}>
                 <p>Username</p>
-                <input type="text" required onChange={(e) => setPassword(e.target.value)} placeholder='johndoe' />
+                <input type="text" required onChange={(e) => setUsernameHere(e.target.value)} placeholder='johndoe' />
                 <p>Password</p>
-                <input type="password" required onChange={(e) => setUsername(e.target.value)} placeholder='secret' />
+                <input type="password" required onChange={(e) => setPassword(e.target.value)} placeholder='secret' />
                 <button type="submit" >Submit</button>
                 <div>
                     <p><input type="checkbox" />Remember me</p>

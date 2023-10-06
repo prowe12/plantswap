@@ -1,6 +1,7 @@
 import "../index.css"
 
 export default function Available(props) {
+
     return (
         <div className="plants_table" id="plants_table">
             <h1>Available plants</h1>
@@ -16,10 +17,18 @@ export default function Available(props) {
                     </tr>
                 </thead>
                 <tbody>
-                    {props.shares}
+                    {props.shares.map((share) => (
+                        <tr key={(share.id)}>
+                            <td>{share.plant_name}</td>
+                            <td>{share.amount}</td>
+                            <td>{share.description}</td>
+                            <td>{share.is_available_now ? 'Yes' : 'No'} </td>
+                            <td>{share.shared_by}</td>
+                            <td>{share.date}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
-
         </div>
     );
 }
