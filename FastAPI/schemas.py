@@ -7,6 +7,18 @@ from pydantic import BaseModel
 
 
 # From fastapi tutorial
+
+
+# From fastapi tutorial 2023/10/5
+class Token(BaseModel):
+    """Model for access tokens"""
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: str | None = None
+
 class User(BaseModel):
     """
     For managing user logins
@@ -14,9 +26,9 @@ class User(BaseModel):
     """
 
     username: str
-    email: Union[str, None] = None
-    full_name: Union[str, None] = None
-    disabled: Union[bool, None] = None
+    email: str | None = None
+    full_name: str | None = None
+    disabled: bool | None = None
 
 
 # From fastapi tutorial 2023/09/18
