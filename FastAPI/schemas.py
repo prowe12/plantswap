@@ -19,16 +19,49 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     username: str | None = None
 
-class User(BaseModel):
-    """
-    For managing user logins
-    disabled refers to whether the account is active
-    """
+class ItemBase(BaseModel):
+    title:str
+    description: str | None = None
 
+class ItemCreate(ItemBase):
+    pass
+
+class Item(ItemBase):
+    id: int
+    owner_id: int
+    
+    # Read the data even if it's not a dict but an ORM. The Pydantic 
+    # model is then compatible with ORMs, and can be declared in the 
+    # response_model argument in the path operations.
+    class Config:
+        orm_mode = True
+
+class UserBase(BaseModel):
+    email: str
     username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    is_active: bool
+    # item: list[Item] = []
+
+    class Config:
+        orm_mode = True
+
+
+# class User(BaseModel):
+#     """
+#     For managing user logins
+#     disabled refers to whether the account is active
+#     """
+
+#     username: str
+#     email: str | None = None
+#     full_name: str | None = None
+#     disabled: bool | None = None
 
 
 # From fastapi tutorial 2023/09/18
