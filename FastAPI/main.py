@@ -10,6 +10,9 @@ https://fastapi.tiangolo.com/tutorial/
 https://betterprogramming.pub/how-to-authentication-users-with-token-in-a-react-application-f99997c2ee9d
 https://www.youtube.com/watch?v=_dIs3IZAG0Q
 Daniel Neshyba-Rowe
+
+Start with
+$ poetry run uvicorn main:app --reload
 """
 
 from datetime import datetime, timedelta

@@ -114,7 +114,6 @@ const Dashboard = () => {
     const handleFormSubmit = async (event) => {
         event.preventDefault();
         // Post, get, and set shares
-        console.log(token)
         if (token) {
             await api.post('/shares/', formData);
             fetchShares();
