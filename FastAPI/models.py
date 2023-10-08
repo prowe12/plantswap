@@ -7,11 +7,11 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-
+    # email = Column(String, unique=True, index=True)
+    
     # When accessing my_user.items, SQLAlchemy will fetch the items 
     # from the items table and populate them here.
     # items = relationship("Item", back_populates="owner")

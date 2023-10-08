@@ -37,7 +37,7 @@ class Item(ItemBase):
         orm_mode = True
 
 class UserBase(BaseModel):
-    email: str
+    # email: str
     username: str
 
 class UserCreate(UserBase):
@@ -46,6 +46,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
+    hashed_password: str
     # item: list[Item] = []
 
     class Config:

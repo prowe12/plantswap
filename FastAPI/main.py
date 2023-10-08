@@ -27,13 +27,6 @@ import models
 import schemas
 import crud
 
-# # to get a string like this run:
-# # openssl rand -hex 32
-# SECRET_KEY = "00972ba440d93ae95db349c7ccd03d61f3a7138a4a14fae93402edd73db9a05b"
-# ALGORITHM = "HS256"
-# ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
 # # From fastapi tutorial 2023/09/18
 # fake_users_db = {
 #     "johndoe": {
@@ -131,12 +124,28 @@ db_dependency = Annotated[Session, Depends(get_db)]
 
 
 
+# @app.post("/users/", response_model=schemas.User)
+# def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+#     db_user = crud.get_user_by_email(db, email=user.email)
+#     if db_user:
+#         raise HTTPException(status_code=400, detail="Email already registered")
+#     return crud.create_user(db=db, user=user)
+
+# Recall that the response_model is for declaring the return type for
+# the pydantic model corresponding to what is returned 
+# crud.create_user returns user info of type models.User, with fields:
+# id (int), username (str), hashed_password (str) and is_active (bool)
+# This corresponds to schemas.User.
 @app.post("/users/", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_email(db, email=user.email)
+def create_user(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session=Depends(get_db),
+):
+    db_user = crud.get_user_by_username(db, username=form_data.username)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return crud.create_user(db=db, user=user)
+        raise HTTPException(status_code=400, detail="User already registered")
+    return crud.create_user(db, form_data.username, form_data.password)
+
 
 
 @app.get("/users/", response_model=list[schemas.User])
@@ -207,6 +216,12 @@ async def get_current_active_user(
     return current_user
 
 
+# Here we use the path operation decorator parameter response_model 
+# set to schemas.Token so we can return a dictionary with access_token
+# and token type but not have to give that return type; instead the decorator
+# declares it as a Pydantic model, so the Pydantic model does data 
+# documentation, validation etc for the dictionary
+#
 # From fastapi tutorial 2023/09/18
 # Use OAuth2PasswordRequestForm as a dependency with Depends in the path
 # operation for /token. OAuth2PasswordRequestForm is a class dependency
@@ -225,8 +240,6 @@ async def login_for_access_token(
     :returns: Access token
     :raises  HTTPException if authentication fails
     """
-
-    # user = crud.authenticate_user(fake_users_db, form_data.username, form_data.password)
     user = crud.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
