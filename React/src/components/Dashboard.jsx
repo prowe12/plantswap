@@ -5,6 +5,7 @@ import api from "./../api"
 import Available from "./Available"
 import Requested from "./Requested"
 import Login from "./Login"
+import Register from "./Register"
 import FilterButton from "./FilterButton"
 
 const FILTER_MAP = {
@@ -165,10 +166,16 @@ const Dashboard = () => {
 
     if (!token) {
         // If the user has not logged in, do not show submit forms
+        // instead show sign up and login
         {
             return (
                 <div>
-                    {/* Login form */}
+                    {/* Registration form */}
+                    <div>
+                        <Register setToken={setToken} setUsername={setUsername} />
+                    </div>
+
+                   {/* Login form */}
                     <div>
                         <Login setToken={setToken} setUsername={setUsername} />
                     </div>
