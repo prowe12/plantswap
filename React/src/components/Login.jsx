@@ -47,7 +47,7 @@ const Login = ({ setToken, setUsername}) => {
         else setLoginMsg("Incorrect username or password, please retry.");
     }
     return (
-        <div>
+        <div className="login">
             <h1>Sign in</h1>
             <form onSubmit={handleSubmit}>
                 <p>Username</p>
@@ -60,9 +60,7 @@ const Login = ({ setToken, setUsername}) => {
                 </div> */}
             </form>
 
-            <br></br>
-            <br></br>
-            <p>{loginMsg}</p>
+            <p className="login_msg">{loginMsg}</p>
         </div>
     )
 }

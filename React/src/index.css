@@ -8,6 +8,23 @@
   background-color: white;
 }
 
+.login {
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: 8rem;
+  padding-right: 8rem;
+  color: #0c5931;
+  background-color: white;
+}
+
+.login_msg {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .plants_table {
   max-width: 100%;
   margin-right: auto;

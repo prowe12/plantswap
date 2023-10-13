@@ -51,7 +51,7 @@ const Register = () => {
         setWelcomeMsg(welcome_msg)
     }
     return (
-        <div>
+        <div className="login">
             <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
                 <p>Email</p>
@@ -60,12 +60,9 @@ const Register = () => {
                 <input type="password" required onChange={(e) => setPassword(e.target.value)} placeholder='secret' />
                 <button type="submit" >Submit</button>
 
-                <br></br>
-                <br></br>
-                <p>{welcomeMsg}</p>
+                <p className="login_msg">{welcomeMsg}</p>
                 
             </form>
-            <br></br>
         </div>
     )
 }

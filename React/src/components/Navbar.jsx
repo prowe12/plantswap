@@ -34,6 +34,12 @@ export default function Navbar() {
                     <li>
                         <a href="#request">Request</a>
                     </li>
+                    <li>
+                        <a href="#plants_table">Sign In</a>
+                    </li>
+                    <li>
+                        <a href="#plants_table">Register</a>
+                    </li>
                 </ul>
             </div>
         </nav >
